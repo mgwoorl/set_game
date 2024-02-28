@@ -148,17 +148,18 @@ def game_field():
        return jsonify({"message": "Please enter your token"}), 400
 
    for player in players:
-       if player["player"] == current_user[-1]["accessToken"] and field != [] and all(field.get("gameId") != player["roomId"] for player in players):
-           return jsonify({"message": "Field for this room is already created"}), 400
+       if player["player"] == current_user[-1]["nickname"] and field != [] and all(f.get("gameId") == player["roomId"] for f in field):
+           return jsonify({"message": "Field for this room was already created"}), 400
 
-       elif player["player"] == current_user[-1]["accessToken"] and field == []:
-           sorted_deck = random.shuffle(deck)
+       elif player["player"] == current_user[-1]["nickname"] and field == []:
+           random.shuffle(deck)
            cards_for_first_time = []
            for i in range(1, 13):
-               cards_for_first_time.append(sorted_deck[i])
-           field.append({"gameId": player["gameId"], "cards": cards_for_first_time})
+               cards_for_first_time.append(deck[i])
+           field.append({"gameId": player["gameId"], "cards": cards_for_first_time, "status": "ongoing", "score": 0})
+           return jsonify({"cards": cards_for_first_time, "status": "ongoing", "score": 0}), 400
 
-   return jsonify({"message": "Your token may be wrong or this room doesn't exist"}), 400
+   return jsonify({"message": "Error"}), 400
 
 if __name__ == "__main__":
     app.run(debug=True)
